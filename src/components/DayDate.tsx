@@ -7,7 +7,7 @@ function DayDate() {
     const [month, setMonth] = useState<string>('');
     const [year, setYear] = useState<number>(0);
 
-    const [tasks, setTasks] = useState<string[]>([]);
+    const [tasks, setTasks] = useState<{ [key: string]: string[] }>({});
     const [task, setTask] = useState<string>('');
 
     const days = [
@@ -47,11 +47,10 @@ function DayDate() {
         setYear(date.getFullYear());
     }, []);
 
-
     const nextDay = () => {
         const currentDate = new Date(year, months.indexOf(month), dayOfWeek); // Tworzymy datę na podstawie stanu
         currentDate.setDate(currentDate.getDate() + 1); // Przechodzimy do następnego dnia
-    
+
         // Aktualizujemy stan na podstawie nowej daty
         setDay(days[currentDate.getDay()]);
         setDayOfWeek(currentDate.getDate());
@@ -67,41 +66,64 @@ function DayDate() {
         setDayOfWeek(currentDate.getDate());
         setMonth(months[currentDate.getMonth()]);
         setYear(currentDate.getFullYear());
-    }
+    };
+
+    const getDateKey = (year: number, month: string, day: number) => {
+        const monthIndex = months.indexOf(month) + 1; // Dodajemy 1, ponieważ miesiące w Date są indeksowane od 0
+        const formattedMonth = monthIndex < 10 ? `0${monthIndex}` : monthIndex; // Dodajemy 0 przed miesiącem, jeśli jest jednocyfrowy
+        const formattedDay = day < 10 ? `0${day}` : day; // Dodajemy 0 przed dniem, jeśli jest jednocyfrowy
+        return `${year}-${formattedMonth}-${formattedDay}`; // Zwracamy sformatowany klucz daty
+    };
 
     const addTask = () => {
-        if(task.trim() !== '') {
-            setTasks([...tasks, task]);
-            setTask(' ');
+        if (task.trim() !== '') {
+            const dateKey = getDateKey(year, month, dayOfWeek);
+            const updatedTask = { ...tasks };
+            if (!updatedTask[dateKey]) {
+                updatedTask[dateKey] = [];
+            }
+            updatedTask[dateKey].push(task);
+            setTasks(updatedTask);
+            setTask('');
         }
-    }
+    };
 
     const deleteTask = (index: number) => {
-        const newTasks = tasks.filter((_, i) => i !== index);
-        setTasks(newTasks);
-    }
+        const dateKey = getDateKey(year, month, dayOfWeek);
+        const updatedTask = { ...tasks };
+        updatedTask[dateKey] = updatedTask[dateKey].filter((_, i) => i !== index); // Usuwamy zadanie o danym indeksie
+        setTasks(updatedTask);
+    };
 
-    return(
+    const dateKey = getDateKey(year, month, dayOfWeek); // Pobierz klucz daty
+    const currentTask = tasks[dateKey] || []; // Pobierz zadania dla bieżącej daty lub pustą tablicę
+
+    return (
         <>
             <div className="day-date">
-
-            <img onClick={prevDay} src='/src/icons/left-chevron.png'></img>
-            <div className='date-inner'>
-                <p className='arrow-left'></p>
-                <p className='day-date-text'>{day}</p>
-                <p className='month-day-year'>{month} {dayOfWeek}, {year}</p>
-            </div>
-            <img onClick={nextDay} src='/src/icons/right-chevron.png'></img>
+                <img onClick={prevDay} src='/src/icons/left-chevron.png' alt="Previous Day" />
+                <div className='date-inner'>
+                    <p className='arrow-left'></p>
+                    <p className='day-date-text'>{day}</p>
+                    <p className='month-day-year'>{month} {dayOfWeek}, {year}</p>
+                </div>
+                <img onClick={nextDay} src='/src/icons/right-chevron.png' alt="Next Day" />
             </div>
 
             <div className='task-list'>
-            <div className='task-inputs'>
-                <input onChange={(e) => setTask(e.target.value)} type='text' placeholder='Add new task...' className='task-input'></input>
-                <button onClick={addTask} className='add-task-button'>Add</button>
-            </div>
+                <div className='task-inputs'>
+                    <input
+                        onChange={(e) => setTask(e.target.value)}
+                        type='text'
+                        placeholder='Add new task...'
+                        className='task-input'
+                        value={task}
+                    />
+                    <button onClick={addTask} className='add-task-button'>Add</button>
+                </div>
                 <div className='task-list-inner'>
                     <ul className='task-ul'>
-                        {tasks.map((task, index) => (
+                        {currentTask.map((task, index) => (
                             <li className='task-text' key={index}>
                                 <input type='checkbox' className='checkbox'></input>
                                 {task}
@@ -112,7 +134,7 @@ function DayDate() {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
-export default DayDate
+export default DayDate;
