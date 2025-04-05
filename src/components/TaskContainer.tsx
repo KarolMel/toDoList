@@ -1,22 +1,47 @@
 import '../index.css'
-import { useState } from 'react';
-function TaskContainer() {
+import { useState, useEffect } from 'react';
+
+interface Props {
+    name: string;
+}
+
+function TaskContainer(props: Props) {
 
     const [tasks, setTasks] = useState<string[]>([]);
     const [task, setTask] = useState<string>('');
+    const storageKey = props.name;
 
+    useEffect(() => {
+        const storedTasks = localStorage.getItem(storageKey);
+        if (storedTasks) {
+            try {
+                const parsedTasks = JSON.parse(storedTasks);
+                if (Array.isArray(parsedTasks)) {
+                    setTasks(parsedTasks); // Ustaw stan tylko, jeśli dane są tablicą
+                } else {
+                    console.error('Invalid tasks format in localStorage');
+                    setTasks([]); // Ustaw pustą tablicę, jeśli dane są nieprawidłowe
+                }
+            } catch (error) {
+                console.error('Error parsing tasks from localStorage:', error);
+                setTasks([]); // Ustaw pustą tablicę w przypadku błędu
+            }
+        }
+    }, []);
 
     function addTask() {
         if (task.trim() !== '') {
-            setTasks([...tasks, task]);
+            const updatedTasks = [...tasks, task];
+            localStorage.setItem(storageKey, JSON.stringify(updatedTasks));
+            setTasks(updatedTasks);
             setTask('');
         }
     }
 
     function deleteTask(index: number) {
-        const deleteTask = tasks.filter((_, i) => i !== index);
-        setTasks(deleteTask);
-        console.log('dziala')
+        const updatedTask = tasks.filter((_, i) => i !== index);
+        localStorage.setItem(storageKey, JSON.stringify(updatedTask));
+        setTasks(updatedTask);
     }
 
 

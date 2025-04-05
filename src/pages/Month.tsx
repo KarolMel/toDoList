@@ -4,7 +4,7 @@ function Month() {
     return(
         <>
         <h1 style={{textAlign:'center'}}>Month</h1>
-        <TaskContainer/>
+        <TaskContainer name='tasks-month'/>
         </>
 
     )

@@ -4,7 +4,7 @@ function Week() {
     return(
         <>
         <h1 style={{textAlign:'center'}}>Week</h1>
-        <TaskContainer/>
+        <TaskContainer name='tasks-week'/>
         </>
     )
 }

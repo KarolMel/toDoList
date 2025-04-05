@@ -47,6 +47,13 @@ function DayDate() {
         setYear(date.getFullYear());
     }, []);
 
+    useEffect(() => {
+        const storedTasks = localStorage.getItem('tasks');
+        if (storedTasks) {
+            setTasks(JSON.parse(storedTasks)); // Ustaw stan na podstawie danych z localStorage
+        }
+    }, []);
+
     const nextDay = () => {
         const currentDate = new Date(year, months.indexOf(month), dayOfWeek); // Tworzymy datę na podstawie stanu
         currentDate.setDate(currentDate.getDate() + 1); // Przechodzimy do następnego dnia
@@ -85,6 +92,8 @@ function DayDate() {
             updatedTask[dateKey].push(task);
             setTasks(updatedTask);
             setTask('');
+
+            localStorage.setItem('tasks', JSON.stringify(updatedTask)); // Zapisz zadania do localStorage
         }
     };
 
@@ -93,6 +102,8 @@ function DayDate() {
         const updatedTask = { ...tasks };
         updatedTask[dateKey] = updatedTask[dateKey].filter((_, i) => i !== index); // Usuwamy zadanie o danym indeksie
         setTasks(updatedTask);
+
+        localStorage.setItem('tasks', JSON.stringify(updatedTask)); // Zapisz zaktualizowane zadania do localStorage
     };
 
     const dateKey = getDateKey(year, month, dayOfWeek); // Pobierz klucz daty

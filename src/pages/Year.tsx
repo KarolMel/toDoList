@@ -1,6 +1,11 @@
+import TaskContainer from "../components/TaskContainer"
+
 function Year() {
     return(
-        <><h1>Year</h1></>
+    <>
+        <h1 style={{textAlign:'center'}}>Year</h1>
+        <TaskContainer name='tasks-year'/>
+    </>
     )
 }
 
