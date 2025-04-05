@@ -1,6 +1,12 @@
+import TaskContainer from "../components/TaskContainer"
+
 function Month() {
     return(
-        <><h1>Month</h1></>
+        <>
+        <h1 style={{textAlign:'center'}}>Month</h1>
+        <TaskContainer/>
+        </>
+
     )
 }
 
